@@ -1,9 +1,9 @@
-﻿<Window x:Class="MNS.AboutDataFileWindow"
+﻿<Window x:Class="TR3100.AboutDataFileWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MNS"
+        xmlns:local="clr-namespace:TR3100"
         mc:Ignorable="d"
          Title="Информация о файле данных и оценке среднего" Width="760" Height="650" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Background="NavajoWhite">
     <Grid>

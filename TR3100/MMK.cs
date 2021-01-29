@@ -7,9 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace MNS
+namespace TR3100
 {
-    class ModbusRTU
+    class MMK
     {
         // Переменная которая хранит сообщние-команду Modbus в виде List
         private List<byte> Modbus_Message;
@@ -53,7 +53,7 @@ namespace MNS
         /// Конструктор класса ModbusRTU
         /// </summary>
         /// <param name="modbusRTUSettings">Экземпляр класса ModbusRTUSettings</param>
-        public ModbusRTU(ModbusRTUSettings modbusRTUSettings)
+        public MMK(ModbusRTUSettings modbusRTUSettings)
         {
             Modbus_Message = new List<byte>();
 

@@ -15,7 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace MNS
+namespace TR3100
 {
     /// <summary>
     /// Логика взаимодействия для SettingsWindow.xaml

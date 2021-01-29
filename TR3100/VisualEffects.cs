@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace MNS
+namespace TR3100
 {
     public static class VisualEffects
     {

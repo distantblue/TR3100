@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace MNS
+namespace TR3100
 {
     /// <summary>
     /// Логика взаимодействия для App.xaml

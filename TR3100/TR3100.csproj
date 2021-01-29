@@ -91,6 +91,7 @@
     <Compile Include="AboutDataFileWindow.xaml.cs">
       <DependentUpon>AboutDataFileWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CRC.cs" />
     <Compile Include="DataManager.cs" />
     <Compile Include="FileSaveWindow.xaml.cs">
       <DependentUpon>FileSaveWindow.xaml</DependentUpon>
@@ -98,7 +99,7 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ModbusRTU.cs" />
+    <Compile Include="MMK.cs" />
     <Compile Include="ModbusRTUSettings.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>

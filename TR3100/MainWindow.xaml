@@ -1,9 +1,9 @@
-﻿<Window x:Class="MNS.MainWindow"
+﻿<Window x:Class="TR3100.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MNS"
+        xmlns:local="clr-namespace:TR3100"
         mc:Ignorable="d"
         Icon="Icon_favicon.ico"
         Title="МНС 1100 - Измерительная система для ПК" MinWidth="1360" MinHeight="800"  Width="1360" Height="800"  Background="Gray" WindowStartupLocation="CenterScreen">

@@ -7,7 +7,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO.Ports;
 
-namespace MNS
+namespace TR3100
 {
     [Serializable]
     public class ModbusRTUSettings

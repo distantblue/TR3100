@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace MNS
+namespace TR3100
 {
     /// <summary>
     /// Логика взаимодействия для TechnicalAssistanceWindow.xaml

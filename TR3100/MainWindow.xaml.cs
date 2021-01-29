@@ -20,7 +20,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace MNS
+namespace TR3100
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
@@ -31,7 +31,7 @@ namespace MNS
         ModbusRTUSettings CurrentModbusRTUSettings;
 
         // ОБЪЯВЛЕНИЕ ОБЪЕКТА ModbusRTU
-        ModbusRTU Modbus;
+        MMK Modbus;
 
         // ТАЙМЕР ПО КОТОРОМУ ВЫЗЫВАЕТСЯ ИЗМЕРЕНИЕ
         Timer Timer;
@@ -954,7 +954,7 @@ namespace MNS
 
                 CurrentModbusRTUSettings.GetCurrentSettings(); // Считываем настройки из файла настроек
 
-                Modbus = new ModbusRTU(CurrentModbusRTUSettings); // Создаем объект ModbusRTU
+                Modbus = new MMK(CurrentModbusRTUSettings); // Создаем объект ModbusRTU
 
                 // Modbus.DeviceNotRespondingError += this.DisplayErrorOccurred; // Подписываемся на обработчик события "Устройство не отвечает" 
                 Modbus.SerialPortOpeningError += this.DisplayErrorOccurred; // Подписываемся на обработчик события "Ошибка открытия порта"

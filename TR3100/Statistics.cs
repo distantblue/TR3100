@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MNS
+namespace TR3100
 {
     public static class Statistics
     {
