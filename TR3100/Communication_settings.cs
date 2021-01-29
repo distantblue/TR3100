@@ -10,28 +10,25 @@ using System.IO.Ports;
 namespace TR3100
 {
     [Serializable]
-    public class ModbusRTUSettings
+    public class Communication_settings
     {
-        // ИМЯ ПОРТА
-        public string PortName { get; set; }
+        // ИМЯ ФАЙЛА НАСТРОЕК
+        [NonSerialized]
+        public readonly string CommunicationSettingsFileName = @"Communication_settings.dat";
+
+        // ПУТЬ к ФАЙЛУ НАСТРОЕК        
+        [NonSerialized]
+        public readonly string CommunicationSettingsFilePath;
 
         // ИНТЕРВАЛ ОПРОСА
         public int PollingInterval { get; set; }
 
-        //[NonSerialized]
-        public byte ModbusRTUSlaveAddress { get; set; }
-
-        // ИМЯ ФАЙЛА НАСТРОЕК
-        [NonSerialized]
-        public readonly string ModbusRTUSettingsFileName = @"ModbusRTUSettings.dat";
-
-        // ПУТЬ к ФАЙЛУ НАСТРОЕК
-        [NonSerialized]
-        public readonly string ModbusRTUSettingsFilePath;
+        // АДРЕС УСТРОЙСТВА     
+        public byte SlaveAddress { get; set; }
 
         // НАСТРОЙКИ COM-порта
-        [NonSerialized]
-        public readonly int BaudRate = 19200;
+        public string PortName { get; set; }
+        public int BaudRate { get; set; }
         [NonSerialized]
         public readonly Parity Parity = Parity.None;
         [NonSerialized]
@@ -58,81 +55,84 @@ namespace TR3100
         public readonly int ResponseTimeout = 120;
 
         // Объявляю делегат
-        public delegate void ModbusRTUSettingsErrorHandler(string message);
+        public delegate void CommunicationSettingsErrorHandler(string message);
 
         // Обявляю событие "не найден файл настроек"
-        public event ModbusRTUSettingsErrorHandler SettingsFileNotFoundError;
+        public event CommunicationSettingsErrorHandler SettingsFileNotFoundError;
 
         // Обявляю событие "ошибка при чтении файла настроек"
-        public event ModbusRTUSettingsErrorHandler SettingsFileReadingError;
+        public event CommunicationSettingsErrorHandler SettingsFileReadingError;
 
-        public ModbusRTUSettings()
+        public Communication_settings()
         {
             // Инициализируем переменные значениями по умолчанию, чтоб не ссылались в null
             this.SilentInterval = GetSilentInterval();
             this.PortName = "COM1";
             this.PollingInterval = 1;
-            this.ModbusRTUSlaveAddress = 0x09;
+            this.SlaveAddress = 0x0A;
+            this.BaudRate = 9600;
 
             // Формирование пути к файлу настроек
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append("Settings");
             stringBuilder.Append(@"\");
-            stringBuilder.Append($"{ModbusRTUSettingsFileName}");
-            ModbusRTUSettingsFilePath = stringBuilder.ToString();
+            stringBuilder.Append($"{CommunicationSettingsFileName}");
+            CommunicationSettingsFilePath = stringBuilder.ToString();
         }
 
-        public ModbusRTUSettings(string portName, int pollingInterval, byte slaveAddress)
+        public Communication_settings(string portName, int pollingInterval, byte slaveAddress, byte baudRate)
         {
             this.PortName = portName;
             this.PollingInterval = pollingInterval;
-            this.ModbusRTUSlaveAddress = slaveAddress;
+            this.SlaveAddress = slaveAddress;
+            this.BaudRate = baudRate;
             this.SilentInterval = GetSilentInterval();
 
             // Формирование пути к файлу настроек
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append("Settings");
             stringBuilder.Append(@"\");
-            stringBuilder.Append($"{ModbusRTUSettingsFileName}");
-            ModbusRTUSettingsFilePath = stringBuilder.ToString();
+            stringBuilder.Append($"{CommunicationSettingsFileName}");
+            CommunicationSettingsFilePath = stringBuilder.ToString();
         }
 
         public void GetCurrentSettings()
         {
-            ModbusRTUSettings currentSettings = GetCurrentSettings(this.ModbusRTUSettingsFilePath);
-            this.PortName = currentSettings.PortName;
-            this.PollingInterval = currentSettings.PollingInterval;
-            this.ModbusRTUSlaveAddress = currentSettings.ModbusRTUSlaveAddress;
+            Communication_settings currentCommunicationSettings = GetCurrentSettings(this.CommunicationSettingsFilePath);
+            this.PortName = currentCommunicationSettings.PortName;
+            this.PollingInterval = currentCommunicationSettings.PollingInterval;
+            this.SlaveAddress = currentCommunicationSettings.SlaveAddress;
+            this.BaudRate = currentCommunicationSettings.BaudRate;
         }
 
-        public ModbusRTUSettings GetCurrentSettings(string settingsFilePath)
+        public Communication_settings GetCurrentSettings(string settingsFilePath)
         {
-            ModbusRTUSettings currentSettings = null;
+            Communication_settings currentSettings = null;
             BinaryFormatter binaryFormatter = new BinaryFormatter();
 
             try
             {
                 FileStream fileStream = new FileStream(settingsFilePath, FileMode.Open);
-                currentSettings = (ModbusRTUSettings)binaryFormatter.Deserialize(fileStream); // получаем текущие настройки подключения
+                currentSettings = (Communication_settings)binaryFormatter.Deserialize(fileStream); // получаем текущие настройки подключения
                 fileStream.Dispose();
             }
             catch (FileNotFoundException exception)
             {
-                SettingsFileNotFoundError?.Invoke($"В директории \"Settings\" отсутствует файл настроек {ModbusRTUSettingsFileName} \n\n Подробнее о возникшей исключительной ситуации: \n\n {exception.Message}");
+                SettingsFileNotFoundError?.Invoke($"В директории \"Settings\" отсутствует файл настроек {CommunicationSettingsFileName} \n\n Подробнее о возникшей исключительной ситуации: \n\n {exception.Message}");
             }
             catch (System.Runtime.Serialization.SerializationException exception)
             {
-                SettingsFileReadingError?.Invoke($"Возникла ошибка при десериализации объекта настроек программы из файла настроек {ModbusRTUSettingsFileName} \n\n Подробнее о возникшей исключительной ситуации: \n\n {exception.Message}");
+                SettingsFileReadingError?.Invoke($"Возникла ошибка при десериализации объекта настроек программы из файла настроек {CommunicationSettingsFileName} \n\n Подробнее о возникшей исключительной ситуации: \n\n {exception.Message}");
             }
             catch (Exception exception)
             {
-                SettingsFileReadingError?.Invoke($"Возникла ошибка при считывании настроек программы из файла настроек {ModbusRTUSettingsFileName} \n\n Подробнее о возникшей исключительной ситуации: \n\n {exception.Message}");
+                SettingsFileReadingError?.Invoke($"Возникла ошибка при считывании настроек программы из файла настроек {CommunicationSettingsFileName} \n\n Подробнее о возникшей исключительной ситуации: \n\n {exception.Message}");
             }
 
             return currentSettings;
         }
 
-        public void SaveSettings(ModbusRTUSettings settings, string settingsFilePath)
+        public void SaveSettings(Communication_settings settings, string settingsFilePath)
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
 
@@ -144,11 +144,11 @@ namespace TR3100
             }
             catch (System.Runtime.Serialization.SerializationException exception)
             {
-                SettingsFileReadingError?.Invoke($"Возникла ошибка при сериализации объекта настроек программы в файл настроек {ModbusRTUSettingsFileName} \n\n Подробнее о возникшей исключительной ситуации: \n\n {exception.Message}");
+                SettingsFileReadingError?.Invoke($"Возникла ошибка при сериализации объекта настроек программы в файл настроек {CommunicationSettingsFileName} \n\n Подробнее о возникшей исключительной ситуации: \n\n {exception.Message}");
             }
             catch (Exception exception)
             {
-                SettingsFileReadingError?.Invoke($"Возникла ошибка при сериализации объекта настроек программы в файл настроек {ModbusRTUSettingsFileName} \n\n Подробнее о возникшей исключительной ситуации: \n\n {exception.Message}");
+                SettingsFileReadingError?.Invoke($"Возникла ошибка при сериализации объекта настроек программы в файл настроек {CommunicationSettingsFileName} \n\n Подробнее о возникшей исключительной ситуации: \n\n {exception.Message}");
             }
         }
 

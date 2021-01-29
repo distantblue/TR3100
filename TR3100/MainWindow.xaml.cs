@@ -28,7 +28,7 @@ namespace TR3100
     public partial class MainWindow : Window
     {
         // ТЕКУЩИЕ НАСТРОЙКИ связи с устройством Modbus
-        ModbusRTUSettings CurrentModbusRTUSettings;
+        Communication_settings CurrentModbusRTUSettings;
 
         // ОБЪЯВЛЕНИЕ ОБЪЕКТА ModbusRTU
         MMK Modbus;
@@ -186,8 +186,8 @@ namespace TR3100
 
             ///*
             // ВРЕМЕННОЕ СЕРИАЛИЗАЦИЯ ФАЙЛА НАСТРОЕК
-            CurrentModbusRTUSettings = new ModbusRTUSettings("COM1", 1, 9);
-            CurrentModbusRTUSettings.SaveSettings(CurrentModbusRTUSettings, CurrentModbusRTUSettings.ModbusRTUSettingsFilePath);
+            CurrentModbusRTUSettings = new Communication_settings("COM1", 1, 9);
+            CurrentModbusRTUSettings.SaveSettings(CurrentModbusRTUSettings, CurrentModbusRTUSettings.CommunicationSettingsFilePath);
             //*/
 
             // ВРЕМЕННАЯ СИМУЛЯЦИЯ НАЛИЧИЯ ДАННЫХ ДЛЯ СОХРАНЕНИЯ
@@ -244,7 +244,7 @@ namespace TR3100
             Modbus.ResponseReceived += this.IdentifyStatus;
 
             // Отправляем запрос на чтение регистра статуса
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 200, 1, 2); // Команда (0x03) на чтение 200-го регистра статуса, считываем 1 регистр 16 бит
+            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 200, 1, 2); // Команда (0x03) на чтение 200-го регистра статуса, считываем 1 регистр 16 бит
         }
 
         private void IdentifyStatus(byte[] buffer)
@@ -356,7 +356,7 @@ namespace TR3100
                     this.ChanalFlag = 0;
 
                     // Отправляем запрос на чтение регистров R 
-                    Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 104, 1, 4);
+                    Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 104, 1, 4);
                     break;
 
                 // Канал L
@@ -368,7 +368,7 @@ namespace TR3100
                     this.ChanalFlag = 1;
 
                     // Отправляем запрос на чтение регистров R 
-                    Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 108, 1, 4);
+                    Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 108, 1, 4);
                     break;
 
                 // Канал C
@@ -380,7 +380,7 @@ namespace TR3100
                     this.ChanalFlag = 2;
 
                     // Отправляем запрос на чтение регистров R 
-                    Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 112, 1, 4);
+                    Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 112, 1, 4);
                     break;
 
                 // Канал M
@@ -392,7 +392,7 @@ namespace TR3100
                     this.ChanalFlag = 3;
 
                     // Отправляем запрос на чтение регистров R 
-                    Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 116, 1, 4);
+                    Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 116, 1, 4);
                     break;
             }
         }
@@ -412,7 +412,7 @@ namespace TR3100
             Modbus.ResponseReceived += this.Get_tgR;
 
             // Отправляем запрос на чтение регистра tgR
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 106, 1, 4);
+            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 106, 1, 4);
         }
 
         private void Get_tgR(byte[] buffer)
@@ -430,7 +430,7 @@ namespace TR3100
             Modbus.ResponseReceived += this.Get_F;
 
             // Отправляем запрос на чтение регистра F
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 120, 1, 4);
+            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 120, 1, 4);
         }
 
         private void Get_L(byte[] buffer)
@@ -448,7 +448,7 @@ namespace TR3100
             Modbus.ResponseReceived += this.Get_tgL;
 
             // Отправляем запрос на чтение регистра tgL
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 110, 1, 4);
+            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 110, 1, 4);
         }
 
         private void Get_tgL(byte[] buffer)
@@ -466,7 +466,7 @@ namespace TR3100
             Modbus.ResponseReceived += this.Get_F;
 
             // Отправляем запрос на чтение регистра F
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 120, 1, 4);
+            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 120, 1, 4);
         }
 
         private void Get_C(byte[] buffer)
@@ -484,7 +484,7 @@ namespace TR3100
             Modbus.ResponseReceived += this.Get_tgC;
 
             // Отправляем запрос на чтение регистра tgС
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 114, 1, 4);
+            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 114, 1, 4);
         }
 
         private void Get_tgC(byte[] buffer)
@@ -502,7 +502,7 @@ namespace TR3100
             Modbus.ResponseReceived += this.Get_F;
 
             // Отправляем запрос на чтение регистра F
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 120, 1, 4);
+            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 120, 1, 4);
         }
 
         private void Get_M(byte[] buffer)
@@ -520,7 +520,7 @@ namespace TR3100
             Modbus.ResponseReceived += this.Get_tgM;
 
             // Отправляем запрос на чтение регистра tgM
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 118, 1, 4);
+            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 118, 1, 4);
         }
 
         private void Get_tgM(byte[] buffer)
@@ -538,7 +538,7 @@ namespace TR3100
             Modbus.ResponseReceived += this.Get_F;
 
             // Отправляем запрос на чтение регистра F
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 120, 1, 4);
+            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 120, 1, 4);
         }
 
         private void Get_F(byte[] buffer)
@@ -556,7 +556,7 @@ namespace TR3100
             Modbus.ResponseReceived += this.IdentifyRangeInterval;
 
             // Отправляем запрос на чтение регистра пределов измерения
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.ModbusRTUSlaveAddress, 0x03, 201, 1, 2); // Команда (0x03) на чтение 201-го регистра статуса, считываем 1 регистр 16 бит
+            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 201, 1, 2); // Команда (0x03) на чтение 201-го регистра статуса, считываем 1 регистр 16 бит
         }
 
         private void IdentifyRangeInterval(byte[] buffer)
@@ -948,7 +948,7 @@ namespace TR3100
         {
             if (Modbus == null)
             {
-                CurrentModbusRTUSettings = new ModbusRTUSettings(); // Создаем объект настроек
+                CurrentModbusRTUSettings = new Communication_settings(); // Создаем объект настроек
                 CurrentModbusRTUSettings.SettingsFileNotFoundError += this.DisplayErrorOccurred; // Подписываемся на обработчик события "не найден файл настроек" 
                 CurrentModbusRTUSettings.SettingsFileReadingError += this.DisplayErrorOccurred; // Подписываемся на обработчик события "ошибка при чтении файла настроек"
 

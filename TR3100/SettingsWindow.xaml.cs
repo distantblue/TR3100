@@ -22,7 +22,7 @@ namespace TR3100
     /// </summary>
     public partial class SettingsWindow : Window
     {
-        ModbusRTUSettings CurrentModbusRTUSettings;
+        Communication_settings CurrentModbusRTUSettings;
 
         public delegate void SavingHandler();
         public event SavingHandler SavingSuccess;
@@ -33,7 +33,7 @@ namespace TR3100
             InitializeComponent();
             Loaded += SettingsWindow_Loaded;
 
-            CurrentModbusRTUSettings = new ModbusRTUSettings();
+            CurrentModbusRTUSettings = new Communication_settings();
 
             CurrentModbusRTUSettings.SettingsFileNotFoundError += this.ShowSettingsError; // Подписываемся на событие "не найден файл настроек"
             CurrentModbusRTUSettings.SettingsFileReadingError += this.ShowSettingsError; // Подписываемся на событие "ошибка при чтении файла настроек"
@@ -47,7 +47,7 @@ namespace TR3100
             //ТЕКУЩИЕ НАСТРОЙКИ
             currentSerialPort_label.Content = CurrentModbusRTUSettings.PortName; // отображаем текущий порт в окне настроек
             currentPollingInterval_label.Content = CurrentModbusRTUSettings.PollingInterval; // отображаем текущий интервал опроса
-            currentDeviceAddress_label.Content = "0x"+ CurrentModbusRTUSettings.ModbusRTUSlaveAddress.ToString("x"); // отображаем текущий адрес устройства
+            currentDeviceAddress_label.Content = "0x"+ CurrentModbusRTUSettings.SlaveAddress.ToString("x"); // отображаем текущий адрес устройства
             currentBaudRate_label.Content = CurrentModbusRTUSettings.BaudRate;
             currentDataBits_label.Content = CurrentModbusRTUSettings.DataBits;
             currentStopBits_label.Content = "Один";
@@ -82,8 +82,8 @@ namespace TR3100
             //СОХРАНЕНИЕ НАСТРОЕК
             if (portName_ComboBox.Text != "" && pollingInterval_ComboBox.Text != "" && slaveAddress_ComboBox.Text != "")
             {
-                ModbusRTUSettings newSettings = new ModbusRTUSettings(portName_ComboBox.Text, int.Parse(pollingInterval_ComboBox.Text), (byte)int.Parse(slaveAddress_ComboBox.Text));
-                newSettings.SaveSettings(newSettings, newSettings.ModbusRTUSettingsFilePath);
+                Communication_settings newSettings = new Communication_settings(portName_ComboBox.Text, int.Parse(pollingInterval_ComboBox.Text), (byte)int.Parse(slaveAddress_ComboBox.Text));
+                newSettings.SaveSettings(newSettings, newSettings.CommunicationSettingsFilePath);
 
                 SavingSuccess?.Invoke();
                 this.Close();

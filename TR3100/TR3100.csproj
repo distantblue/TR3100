@@ -100,7 +100,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MMK.cs" />
-    <Compile Include="ModbusRTUSettings.cs" />
+    <Compile Include="Communication_settings.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
