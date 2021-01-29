@@ -1,0 +1,36 @@
+﻿<Window x:Class="MNS.TechnicalAssistanceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MNS"
+        mc:Ignorable="d"
+       Title="Техподдержка" Width="640" Height="240" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Background="White">
+    <Grid>
+        <Border BorderBrush="Black" BorderThickness="2" Margin="8" CornerRadius="12">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left"  >
+                <StackPanel Orientation="Horizontal">
+                    <Border VerticalAlignment="Center">
+                        <Grid>
+                            <Image Source="Icon_developer.jpg" Width="250" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+                <StackPanel VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+                        <Image Source="Icon_email.png" Width="41" Margin="8"/>
+                        <TextBlock VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Margin="16" >
+                            metrology@protonmail.com
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+                        <Image Source="Icon_fb.png" Width="56"/>
+                        <TextBlock VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Margin="16">
+                            <Hyperlink NavigateUri="https://facebook.com/stennikoleksii" RequestNavigate="Hyperlink_RequestNavigate">http://facebook.com/stennikoleksii</Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

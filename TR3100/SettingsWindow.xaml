@@ -1,0 +1,75 @@
+﻿<Window x:Class="MNS.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MNS"
+        mc:Ignorable="d"
+        Title="Настройки подключения МНС 1100" Width="780" Height="320" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Background="NavajoWhite">
+    <Grid>
+        <DockPanel>
+            <Border BorderBrush="Black" BorderThickness="2" Margin="8,8,4,8" CornerRadius="12">
+                <StackPanel DockPanel.Dock="Left" Margin="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Label FontWeight="DemiBold" Margin="0,0,0,15">ТЕКУЩИЕ НАСТРОЙКИ:</Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Порт:</Label>
+                        <Label x:Name="currentSerialPort_label" HorizontalAlignment="Center" FontWeight="DemiBold"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Интервал опроса, [с]:</Label>
+                        <Label x:Name="currentPollingInterval_label" HorizontalAlignment="Center" FontWeight="DemiBold"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Адресное поле MODBUS RTU, [HEX]:</Label>
+                        <Label x:Name="currentDeviceAddress_label" FontWeight="DemiBold"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Символьная скорость, [бод]:</Label>
+                        <Label x:Name="currentBaudRate_label" FontWeight="DemiBold"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Количество бит данных:</Label>
+                        <Label x:Name="currentDataBits_label" FontWeight="DemiBold"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Количество стоповых бит:</Label>
+                        <Label x:Name="currentStopBits_label" FontWeight="DemiBold"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Наличие бита четности:</Label>
+                        <Label x:Name="currentParity_label" FontWeight="DemiBold"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Наличие аппаратного рукопожатия:</Label>
+                        <Label x:Name="currentHandShake_label" FontWeight="DemiBold"></Label>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            <Border BorderBrush="Black" BorderThickness="2" Margin="4,8,8,8" CornerRadius="12">
+                <StackPanel DockPanel.Dock="Right" Margin="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Label FontWeight="DemiBold" Margin="0,0,0,20">ИЗМЕНИТЬ НАСТРОЙКИ:</Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,1">
+                        <Label>Последовательный порт для связи с прибором, [имя порта]:</Label>
+                        <ComboBox x:Name="portName_ComboBox"  Width="100" Margin="8,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,1">
+                        <Label>Интервал опроса прибора, [c]:</Label>
+                        <ComboBox x:Name="pollingInterval_ComboBox"  Width="100"  Margin="172,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,1">
+                        <Label>Адресное поле MODBUS RTU, [DEC]:</Label>
+                        <ComboBox x:Name="slaveAddress_ComboBox"  Width="100"  Margin="142,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button x:Name="SettingsButtonSave" Margin="5,40,100,5" Padding="4" Click="SettingsButtonSave_Click">Сохранить</Button>
+                        <Button x:Name="SettingsButtonCancel" Margin="100,40,5,5" Padding="4" Click="SettingsButtonCancel_Click">Отмена</Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </DockPanel>
+    </Grid>
+</Window>
