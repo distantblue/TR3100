@@ -27,11 +27,11 @@ namespace TR3100
     /// </summary>
     public partial class MainWindow : Window
     {
-        // ТЕКУЩИЕ НАСТРОЙКИ связи с устройством Modbus
+        // ТЕКУЩИЕ НАСТРОЙКИ связи с устройством MMK
         Communication_settings CurrentModbusRTUSettings;
 
-        // ОБЪЯВЛЕНИЕ ОБЪЕКТА ModbusRTU
-        MMK Modbus;
+        // ОБЪЯВЛЕНИЕ ОБЪЕКТА MMK
+        MMK MMK_protocol;
 
         // ТАЙМЕР ПО КОТОРОМУ ВЫЗЫВАЕТСЯ ИЗМЕРЕНИЕ
         Timer Timer;
@@ -184,11 +184,11 @@ namespace TR3100
             DataManager.ClearTempDirectory();
             DataManager.CreateNewDataFile();
 
-            ///*
+            /*
             // ВРЕМЕННОЕ СЕРИАЛИЗАЦИЯ ФАЙЛА НАСТРОЕК
-            CurrentModbusRTUSettings = new Communication_settings("COM1", 1, 9);
+            CurrentModbusRTUSettings = new Communication_settings("COM1", 1, 9, 9600);
             CurrentModbusRTUSettings.SaveSettings(CurrentModbusRTUSettings, CurrentModbusRTUSettings.CommunicationSettingsFilePath);
-            //*/
+            */
 
             // ВРЕМЕННАЯ СИМУЛЯЦИЯ НАЛИЧИЯ ДАННЫХ ДЛЯ СОХРАНЕНИЯ
             //DataToSaveExists = true;
@@ -241,16 +241,16 @@ namespace TR3100
         private void GetSlaveState(object obj)
         {
             // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived += this.IdentifyStatus;
+            MMK_protocol.ResponseReceived += this.IdentifyStatus;
 
             // Отправляем запрос на чтение регистра статуса
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 200, 1, 2); // Команда (0x03) на чтение 200-го регистра статуса, считываем 1 регистр 16 бит
+            MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 200, 1, 2); // Команда (0x03) на чтение 200-го регистра статуса, считываем 1 регистр 16 бит
         }
 
         private void IdentifyStatus(byte[] buffer)
         {
             // ОТПИСЫВАЕМСЯ ОТ СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived -= this.IdentifyStatus;
+            MMK_protocol.ResponseReceived -= this.IdentifyStatus;
 
             // ПОЛУЧАЕМ 16 БИТРОЕ ЗНАЧЕНИЕ СОСТОЯНИЯ ПРИБОРА
             this.SlaveState = BitConverter.ToUInt16(new byte[2] { buffer[4], buffer[3] }, 0);
@@ -350,49 +350,49 @@ namespace TR3100
                 // Канал R
                 case 0:
                     // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-                    Modbus.ResponseReceived += this.Get_R;
+                    MMK_protocol.ResponseReceived += this.Get_R;
 
                     // Включаем флаг основного индицируемого канала
                     this.ChanalFlag = 0;
 
                     // Отправляем запрос на чтение регистров R 
-                    Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 104, 1, 4);
+                    MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 104, 1, 4);
                     break;
 
                 // Канал L
                 case 1:
                     // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-                    Modbus.ResponseReceived += this.Get_L;
+                    MMK_protocol.ResponseReceived += this.Get_L;
 
                     // Включаем флаг основного индицируемого канала
                     this.ChanalFlag = 1;
 
                     // Отправляем запрос на чтение регистров R 
-                    Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 108, 1, 4);
+                    MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 108, 1, 4);
                     break;
 
                 // Канал C
                 case 2:
                     // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-                    Modbus.ResponseReceived += this.Get_C;
+                    MMK_protocol.ResponseReceived += this.Get_C;
 
                     // Включаем флаг основного индицируемого канала
                     this.ChanalFlag = 2;
 
                     // Отправляем запрос на чтение регистров R 
-                    Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 112, 1, 4);
+                    MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 112, 1, 4);
                     break;
 
                 // Канал M
                 case 3:
                     // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-                    Modbus.ResponseReceived += this.Get_M;
+                    MMK_protocol.ResponseReceived += this.Get_M;
 
                     // Включаем флаг основного индицируемого канала
                     this.ChanalFlag = 3;
 
                     // Отправляем запрос на чтение регистров R 
-                    Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 116, 1, 4);
+                    MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 116, 1, 4);
                     break;
             }
         }
@@ -400,7 +400,7 @@ namespace TR3100
         private void Get_R(byte[] buffer)
         {
             // ОТПИСЫВАЕМСЯ ОТ СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived -= this.Get_R;
+            MMK_protocol.ResponseReceived -= this.Get_R;
 
             // Получаем значение сопротивления
             this.Resistance = BitConverter.ToSingle(new byte[4] { buffer[6], buffer[5], buffer[4], buffer[3] }, 0);
@@ -409,16 +409,16 @@ namespace TR3100
             Display_R();
 
             // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived += this.Get_tgR;
+            MMK_protocol.ResponseReceived += this.Get_tgR;
 
             // Отправляем запрос на чтение регистра tgR
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 106, 1, 4);
+            MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 106, 1, 4);
         }
 
         private void Get_tgR(byte[] buffer)
         {
             // ОТПИСЫВАЕМСЯ ОТ СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived -= this.Get_tgR;
+            MMK_protocol.ResponseReceived -= this.Get_tgR;
 
             // Получаем значение tgR
             this.tg_R = BitConverter.ToSingle(new byte[4] { buffer[6], buffer[5], buffer[4], buffer[3] }, 0);
@@ -427,16 +427,16 @@ namespace TR3100
             Display_tgR();
 
             // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived += this.Get_F;
+            MMK_protocol.ResponseReceived += this.Get_F;
 
             // Отправляем запрос на чтение регистра F
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 120, 1, 4);
+            MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 120, 1, 4);
         }
 
         private void Get_L(byte[] buffer)
         {
             // ОТПИСЫВАЕМСЯ ОТ СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived -= this.Get_L;
+            MMK_protocol.ResponseReceived -= this.Get_L;
 
             // Получаем значение индуктивности
             this.Inductance = BitConverter.ToSingle(new byte[4] { buffer[6], buffer[5], buffer[4], buffer[3] }, 0);
@@ -445,16 +445,16 @@ namespace TR3100
             Display_L();
 
             // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived += this.Get_tgL;
+            MMK_protocol.ResponseReceived += this.Get_tgL;
 
             // Отправляем запрос на чтение регистра tgL
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 110, 1, 4);
+            MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 110, 1, 4);
         }
 
         private void Get_tgL(byte[] buffer)
         {
             // ОТПИСЫВАЕМСЯ ОТ СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived -= this.Get_tgL;
+            MMK_protocol.ResponseReceived -= this.Get_tgL;
 
             // Получаем значение tgL
             this.tg_L = BitConverter.ToSingle(new byte[4] { buffer[6], buffer[5], buffer[4], buffer[3] }, 0);
@@ -463,16 +463,16 @@ namespace TR3100
             Display_tgL();
 
             // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived += this.Get_F;
+            MMK_protocol.ResponseReceived += this.Get_F;
 
             // Отправляем запрос на чтение регистра F
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 120, 1, 4);
+            MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 120, 1, 4);
         }
 
         private void Get_C(byte[] buffer)
         {
             // ОТПИСЫВАЕМСЯ ОТ СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived -= this.Get_C;
+            MMK_protocol.ResponseReceived -= this.Get_C;
 
             // Получаем значение емкости
             this.Capacity = BitConverter.ToSingle(new byte[4] { buffer[6], buffer[5], buffer[4], buffer[3] }, 0);
@@ -481,16 +481,16 @@ namespace TR3100
             Display_C();
 
             // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived += this.Get_tgC;
+            MMK_protocol.ResponseReceived += this.Get_tgC;
 
             // Отправляем запрос на чтение регистра tgС
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 114, 1, 4);
+            MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 114, 1, 4);
         }
 
         private void Get_tgC(byte[] buffer)
         {
             // ОТПИСЫВАЕМСЯ ОТ СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived -= this.Get_tgC;
+            MMK_protocol.ResponseReceived -= this.Get_tgC;
 
             // Получаем значение тангенса
             this.tg_C = BitConverter.ToSingle(new byte[4] { buffer[6], buffer[5], buffer[4], buffer[3] }, 0);
@@ -499,16 +499,16 @@ namespace TR3100
             Display_tgC();
 
             // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived += this.Get_F;
+            MMK_protocol.ResponseReceived += this.Get_F;
 
             // Отправляем запрос на чтение регистра F
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 120, 1, 4);
+            MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 120, 1, 4);
         }
 
         private void Get_M(byte[] buffer)
         {
             // ОТПИСЫВАЕМСЯ ОТ СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived -= this.Get_M;
+            MMK_protocol.ResponseReceived -= this.Get_M;
 
             // Получаем значение взаимоиндуктивности
             this.MutualInductance = BitConverter.ToSingle(new byte[4] { buffer[6], buffer[5], buffer[4], buffer[3] }, 0);
@@ -517,16 +517,16 @@ namespace TR3100
             Display_M();
 
             // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived += this.Get_tgM;
+            MMK_protocol.ResponseReceived += this.Get_tgM;
 
             // Отправляем запрос на чтение регистра tgM
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 118, 1, 4);
+            MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 118, 1, 4);
         }
 
         private void Get_tgM(byte[] buffer)
         {
             // ОТПИСЫВАЕМСЯ ОТ СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived -= this.Get_tgM;
+            MMK_protocol.ResponseReceived -= this.Get_tgM;
 
             // Получаем значение тангенса
             this.tg_M = BitConverter.ToSingle(new byte[4] { buffer[6], buffer[5], buffer[4], buffer[3] }, 0);
@@ -535,16 +535,16 @@ namespace TR3100
             Display_tgM();
 
             // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived += this.Get_F;
+            MMK_protocol.ResponseReceived += this.Get_F;
 
             // Отправляем запрос на чтение регистра F
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 120, 1, 4);
+            MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 120, 1, 4);
         }
 
         private void Get_F(byte[] buffer)
         {
             // ОТПИСЫВАЕМСЯ ОТ СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived -= this.Get_F;
+            MMK_protocol.ResponseReceived -= this.Get_F;
 
             // Получаем значение F
             this.Frequency = BitConverter.ToSingle(new byte[4] { buffer[6], buffer[5], buffer[4], buffer[3] }, 0);
@@ -553,16 +553,16 @@ namespace TR3100
             Display_F();
 
             // ПОДПИСЫВАЕМСЯ НА ОБРАБОТЧИК СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived += this.IdentifyRangeInterval;
+            MMK_protocol.ResponseReceived += this.IdentifyRangeInterval;
 
             // Отправляем запрос на чтение регистра пределов измерения
-            Modbus.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 201, 1, 2); // Команда (0x03) на чтение 201-го регистра статуса, считываем 1 регистр 16 бит
+            MMK_protocol.SendCommandToReadRegisters(CurrentModbusRTUSettings.SlaveAddress, 0x03, 201, 1, 2); // Команда (0x03) на чтение 201-го регистра статуса, считываем 1 регистр 16 бит
         }
 
         private void IdentifyRangeInterval(byte[] buffer)
         {
             // ОТПИСЫВАЕМСЯ ОТ СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived -= this.IdentifyRangeInterval;
+            MMK_protocol.ResponseReceived -= this.IdentifyRangeInterval;
 
             // ПОЛУЧАЕМ 16 БИТНОЕ ЗНАЧЕНИЕ ПОДДИАПАЗОНА ИЗМЕРЕНИЯ
             this.RangeIntervalRegister = BitConverter.ToUInt16(new byte[2] { buffer[4], buffer[3] }, 0);
@@ -673,31 +673,31 @@ namespace TR3100
 
         private void DisplayErrorOccurred(string errorMessage)
         {
-            if (Timer != null && Modbus != null)
+            if (Timer != null && MMK_protocol != null)
             {
                 Timer.Change(Timeout.Infinite, 0); // Приостанавливаем измерение
 
                 // ОТПИСЫВАЕМСЯ ОТ ОБРАБОТЧИКОВ СОБЫТИЯ ResposeReceived
-                Modbus.ResponseReceived -= this.IdentifyStatus;
-                Modbus.ResponseReceived -= this.Get_R;
-                Modbus.ResponseReceived -= this.Get_L;
-                Modbus.ResponseReceived -= this.Get_C;
-                Modbus.ResponseReceived -= this.Get_M;
-                Modbus.ResponseReceived -= this.Get_F;
-                Modbus.ResponseReceived -= this.IdentifyRangeInterval;
-                Modbus.ResponseReceived -= this.Get_tgR;
-                Modbus.ResponseReceived -= this.Get_tgL;
-                Modbus.ResponseReceived -= this.Get_tgC;
-                Modbus.ResponseReceived -= this.Get_tgM;
+                MMK_protocol.ResponseReceived -= this.IdentifyStatus;
+                MMK_protocol.ResponseReceived -= this.Get_R;
+                MMK_protocol.ResponseReceived -= this.Get_L;
+                MMK_protocol.ResponseReceived -= this.Get_C;
+                MMK_protocol.ResponseReceived -= this.Get_M;
+                MMK_protocol.ResponseReceived -= this.Get_F;
+                MMK_protocol.ResponseReceived -= this.IdentifyRangeInterval;
+                MMK_protocol.ResponseReceived -= this.Get_tgR;
+                MMK_protocol.ResponseReceived -= this.Get_tgL;
+                MMK_protocol.ResponseReceived -= this.Get_tgC;
+                MMK_protocol.ResponseReceived -= this.Get_tgM;
 
-                Modbus.ResponseReceived -= this.DisplayResponseMessageInConsole;
-                Modbus.RequestSent -= this.DisplayRequestMessageInConsole;
-                Modbus.CRC_Error -= this.ProcessMissedResult;
-                Modbus.SlaveError -= this.ProcessMissedResult;
-                Modbus.DeviceNotRespondingError -= this.ProcessMissedResult;
+                MMK_protocol.ResponseReceived -= this.DisplayResponseMessageInConsole;
+                MMK_protocol.RequestSent -= this.DisplayRequestMessageInConsole;
+                MMK_protocol.CRC_Error -= this.ProcessMissedResult;
+                MMK_protocol.SlaveError -= this.ProcessMissedResult;
+                MMK_protocol.DeviceNotRespondingError -= this.ProcessMissedResult;
                 //Modbus.DeviceNotRespondingError -= this.DisplayErrorOccurred;
 
-                Modbus.Close(); // Закрываем COM порт
+                MMK_protocol.Close(); // Закрываем COM порт
             }
 
             MessageBox.Show(errorMessage, "Ошибка!");
@@ -751,17 +751,17 @@ namespace TR3100
             Timer.Change(Timeout.Infinite, 0); // Приостанавливаем вызов метода GetSlaveState
 
             // ОТПИСЫВАЕМСЯ ОТ ОБРАБОТЧИКОВ СОБЫТИЯ ResposeReceived
-            Modbus.ResponseReceived -= this.IdentifyStatus;
-            Modbus.ResponseReceived -= this.Get_R;
-            Modbus.ResponseReceived -= this.Get_L;
-            Modbus.ResponseReceived -= this.Get_C;
-            Modbus.ResponseReceived -= this.Get_M;
-            Modbus.ResponseReceived -= this.Get_F;
-            Modbus.ResponseReceived -= this.IdentifyRangeInterval;
-            Modbus.ResponseReceived -= this.Get_tgR;
-            Modbus.ResponseReceived -= this.Get_tgL;
-            Modbus.ResponseReceived -= this.Get_tgC;
-            Modbus.ResponseReceived -= this.Get_tgM;
+            MMK_protocol.ResponseReceived -= this.IdentifyStatus;
+            MMK_protocol.ResponseReceived -= this.Get_R;
+            MMK_protocol.ResponseReceived -= this.Get_L;
+            MMK_protocol.ResponseReceived -= this.Get_C;
+            MMK_protocol.ResponseReceived -= this.Get_M;
+            MMK_protocol.ResponseReceived -= this.Get_F;
+            MMK_protocol.ResponseReceived -= this.IdentifyRangeInterval;
+            MMK_protocol.ResponseReceived -= this.Get_tgR;
+            MMK_protocol.ResponseReceived -= this.Get_tgL;
+            MMK_protocol.ResponseReceived -= this.Get_tgC;
+            MMK_protocol.ResponseReceived -= this.Get_tgM;
 
             // ВКЛЮЧАЕМ ТАЙМЕР
             Timer.Change(100, CurrentModbusRTUSettings.PollingInterval * 1000); // Возобновляем вызов метода GetSlaveState
@@ -946,7 +946,7 @@ namespace TR3100
 
         private void Start_measurement()
         {
-            if (Modbus == null)
+            if (MMK_protocol == null)
             {
                 CurrentModbusRTUSettings = new Communication_settings(); // Создаем объект настроек
                 CurrentModbusRTUSettings.SettingsFileNotFoundError += this.DisplayErrorOccurred; // Подписываемся на обработчик события "не найден файл настроек" 
@@ -954,15 +954,15 @@ namespace TR3100
 
                 CurrentModbusRTUSettings.GetCurrentSettings(); // Считываем настройки из файла настроек
 
-                Modbus = new MMK(CurrentModbusRTUSettings); // Создаем объект ModbusRTU
+                MMK_protocol = new MMK(CurrentModbusRTUSettings); // Создаем объект ModbusRTU
 
                 // Modbus.DeviceNotRespondingError += this.DisplayErrorOccurred; // Подписываемся на обработчик события "Устройство не отвечает" 
-                Modbus.SerialPortOpeningError += this.DisplayErrorOccurred; // Подписываемся на обработчик события "Ошибка открытия порта"
-                Modbus.RequestSent += this.DisplayRequestMessageInConsole; // Подписываемся на обработчик события "Отправлена команда"
-                Modbus.ResponseReceived += this.DisplayResponseMessageInConsole; // Подписываемся на обработчик события "Получен ответ"
-                Modbus.CRC_Error += this.ProcessMissedResult;
-                Modbus.SlaveError += this.ProcessMissedResult;
-                Modbus.DeviceNotRespondingError += this.ProcessMissedResult;
+                MMK_protocol.SerialPortOpeningError += this.DisplayErrorOccurred; // Подписываемся на обработчик события "Ошибка открытия порта"
+                MMK_protocol.RequestSent += this.DisplayRequestMessageInConsole; // Подписываемся на обработчик события "Отправлена команда"
+                MMK_protocol.ResponseReceived += this.DisplayResponseMessageInConsole; // Подписываемся на обработчик события "Получен ответ"
+                MMK_protocol.CRC_Error += this.ProcessMissedResult;
+                MMK_protocol.SlaveError += this.ProcessMissedResult;
+                MMK_protocol.DeviceNotRespondingError += this.ProcessMissedResult;
 
                 // Создаем функцию обратного вызова по таймеру
                 Timer = new Timer(new TimerCallback(GetSlaveState), null, 0, CurrentModbusRTUSettings.PollingInterval * 1000);
@@ -971,32 +971,32 @@ namespace TR3100
 
         public void Stop_measurement()
         {
-            if (Modbus != null)
+            if (MMK_protocol != null)
             {
                 // ОТПИСЫВАЕМСЯ ОТ ОБРАБОТЧИКОВ СОБЫТИЯ ResposeReceived
-                Modbus.ResponseReceived -= this.IdentifyStatus;
-                Modbus.ResponseReceived -= this.Get_R;
-                Modbus.ResponseReceived -= this.Get_L;
-                Modbus.ResponseReceived -= this.Get_C;
-                Modbus.ResponseReceived -= this.Get_M;
-                Modbus.ResponseReceived -= this.Get_F;
-                Modbus.ResponseReceived -= this.IdentifyRangeInterval;
-                Modbus.ResponseReceived -= this.Get_tgR;
-                Modbus.ResponseReceived -= this.Get_tgL;
-                Modbus.ResponseReceived -= this.Get_tgC;
-                Modbus.ResponseReceived -= this.Get_tgM;
-                Modbus.ResponseReceived -= this.DisplayResponseMessageInConsole;
-                Modbus.RequestSent -= this.DisplayRequestMessageInConsole;
-                Modbus.CRC_Error -= this.ProcessMissedResult;
-                Modbus.SlaveError -= this.ProcessMissedResult;
-                Modbus.DeviceNotRespondingError -= this.ProcessMissedResult;
+                MMK_protocol.ResponseReceived -= this.IdentifyStatus;
+                MMK_protocol.ResponseReceived -= this.Get_R;
+                MMK_protocol.ResponseReceived -= this.Get_L;
+                MMK_protocol.ResponseReceived -= this.Get_C;
+                MMK_protocol.ResponseReceived -= this.Get_M;
+                MMK_protocol.ResponseReceived -= this.Get_F;
+                MMK_protocol.ResponseReceived -= this.IdentifyRangeInterval;
+                MMK_protocol.ResponseReceived -= this.Get_tgR;
+                MMK_protocol.ResponseReceived -= this.Get_tgL;
+                MMK_protocol.ResponseReceived -= this.Get_tgC;
+                MMK_protocol.ResponseReceived -= this.Get_tgM;
+                MMK_protocol.ResponseReceived -= this.DisplayResponseMessageInConsole;
+                MMK_protocol.RequestSent -= this.DisplayRequestMessageInConsole;
+                MMK_protocol.CRC_Error -= this.ProcessMissedResult;
+                MMK_protocol.SlaveError -= this.ProcessMissedResult;
+                MMK_protocol.DeviceNotRespondingError -= this.ProcessMissedResult;
 
                 // ПРИОСТАНАВЛИВАЕМ ТАЙМЕР
                 Timer.Change(Timeout.Infinite, 0); // Приостанавливаем вызов метода GetSlaveState
                 Thread.Sleep(200);
 
-                Modbus.Close(); // Закрываем COM порт
-                Modbus = null; // Ссылка в null
+                MMK_protocol.Close(); // Закрываем COM порт
+                MMK_protocol = null; // Ссылка в null
 
                 DisplayInactiveMesResults();
             }

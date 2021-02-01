@@ -47,7 +47,7 @@ namespace TR3100
             //ТЕКУЩИЕ НАСТРОЙКИ
             currentSerialPort_label.Content = CurrentModbusRTUSettings.PortName; // отображаем текущий порт в окне настроек
             currentPollingInterval_label.Content = CurrentModbusRTUSettings.PollingInterval; // отображаем текущий интервал опроса
-            currentDeviceAddress_label.Content = "0x"+ CurrentModbusRTUSettings.SlaveAddress.ToString("x"); // отображаем текущий адрес устройства
+            currentDeviceAddress_label.Content = "0x" + CurrentModbusRTUSettings.SlaveAddress.ToString("X"); // отображаем текущий адрес устройства
             currentBaudRate_label.Content = CurrentModbusRTUSettings.BaudRate;
             currentDataBits_label.Content = CurrentModbusRTUSettings.DataBits;
             currentStopBits_label.Content = "Один";
@@ -66,23 +66,26 @@ namespace TR3100
             {
                 addressIntervalRange[i] = i + 1;
             }
-            portName_ComboBox.ItemsSource = serialPortNames; // заполняем ComboBox доступными COM портами 
-            pollingInterval_ComboBox.ItemsSource = pollingIntervalRange; // заполняем ComboBox от 1 до 180
+            int[] baudRateRange = new int[8] { 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200 };
+
+            portName_ComboBox.ItemsSource = serialPortNames; // заполняем ComboBox доступными COM портами
+            pollingInterval_ComboBox.ItemsSource = pollingIntervalRange; // заполняем ComboBox значениями интервала опроса
+            baudRate_ComboBox.ItemsSource = baudRateRange; // заполняем ComboBox доступными значениями символьной скорости
             slaveAddress_ComboBox.ItemsSource = addressIntervalRange; // заполняем ComboBox от 1 до 253 (адреса 0xFE и 0xFF запрещены)
         }
 
         private void SettingsButtonSave_Click(object sender, RoutedEventArgs e)
         {
             //ПРОВЕРКА НА ПУСТЫЕ ПОЛЯ НАСТРОЕК
-            if (portName_ComboBox.Text == "" || pollingInterval_ComboBox.Text == "" || slaveAddress_ComboBox.Text == "")
+            if (portName_ComboBox.Text == "" || pollingInterval_ComboBox.Text == "" || slaveAddress_ComboBox.Text == "" || baudRate_ComboBox.Text == "")
             {
-                MessageBox.Show("Заполните все поля настроек","Ошибка!");
+                MessageBox.Show("Заполните все поля настроек", "Ошибка!");
             }
-            
+
             //СОХРАНЕНИЕ НАСТРОЕК
-            if (portName_ComboBox.Text != "" && pollingInterval_ComboBox.Text != "" && slaveAddress_ComboBox.Text != "")
+            if (portName_ComboBox.Text != "" && pollingInterval_ComboBox.Text != "" && slaveAddress_ComboBox.Text != "" && baudRate_ComboBox.Text != "")
             {
-                Communication_settings newSettings = new Communication_settings(portName_ComboBox.Text, int.Parse(pollingInterval_ComboBox.Text), (byte)int.Parse(slaveAddress_ComboBox.Text));
+                Communication_settings newSettings = new Communication_settings(portName_ComboBox.Text, (byte)int.Parse(pollingInterval_ComboBox.Text), (byte)int.Parse(slaveAddress_ComboBox.Text), int.Parse(baudRate_ComboBox.Text));
                 newSettings.SaveSettings(newSettings, newSettings.CommunicationSettingsFilePath);
 
                 SavingSuccess?.Invoke();

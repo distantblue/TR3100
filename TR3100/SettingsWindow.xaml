@@ -55,7 +55,7 @@
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,1">
                         <Label>Последовательный порт для связи с прибором, [имя порта]:</Label>
                         <ComboBox x:Name="portName_ComboBox"  Width="100" Margin="8,0,0,0"/>
-                    </StackPanel>
+                    </StackPanel>                    
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,1">
                         <Label>Интервал опроса прибора, [c]:</Label>
                         <ComboBox x:Name="pollingInterval_ComboBox"  Width="100"  Margin="172,0,0,0"/>
@@ -63,6 +63,10 @@
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,1">
                         <Label>Адресное поле MODBUS RTU, [DEC]:</Label>
                         <ComboBox x:Name="slaveAddress_ComboBox"  Width="100"  Margin="142,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,1">
+                        <Label>Символьная скорость, [бод]:</Label>
+                        <ComboBox x:Name="baudRate_ComboBox"  Width="100" Margin="184,0,0,0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button x:Name="SettingsButtonSave" Margin="5,40,100,5" Padding="4" Click="SettingsButtonSave_Click">Сохранить</Button>

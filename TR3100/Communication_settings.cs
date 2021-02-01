@@ -80,7 +80,7 @@ namespace TR3100
             CommunicationSettingsFilePath = stringBuilder.ToString();
         }
 
-        public Communication_settings(string portName, int pollingInterval, byte slaveAddress, byte baudRate)
+        public Communication_settings(string portName, byte pollingInterval, byte slaveAddress, int baudRate)
         {
             this.PortName = portName;
             this.PollingInterval = pollingInterval;
@@ -159,7 +159,7 @@ namespace TR3100
             {
                 return delay;
             }
-            if (this.BaudRate == 9600 | BaudRate > 19200)
+            if (this.BaudRate == 9600 || BaudRate > 19200)
             {
                 return delay = 2;
             }

@@ -45,12 +45,12 @@ namespace TR3100
         // Объявляем событие "устройство сообщило об ошибке"
         public event MMKErrorHandler SlaveError;
         // Перемення хранит ожидаемое количество байт данных в ответе устройства
+        // Объявляем событие "не получен ответ от SLAVE-устройства"
+        //public event MMKEventHandler ResponseError;
         private int ExpectedQuantityOfDataBytesInResponse;
         // Перемення хранит ожидаемое количество байт в ответе устройства
         private int ExpectedQuantityOfBytesInResponse;
-
-        // Объявляем событие "не получен ответ от SLAVE-устройства"
-        //public event MMKEventHandler ResponseError;
+        
 
         /// <summary>
         /// Конструктор класса MMK
@@ -69,11 +69,11 @@ namespace TR3100
             ResponseTimeout = communicationSettings.ResponseTimeout; // Интервал после которого начинается считывание поступивших данных на COM порт или вызывается исключение TimeoutException
         }
 
-        private byte[] BuildModbusMessage(byte SlaveAddress, byte FunctionCode, ushort StartingAddressOfRegister, ushort QuantityOfRegisters)
+        private byte[] Build_MMK_message(byte SlaveAddress, byte MMK_function_code, ushort StartingAddressOfRegister, ushort QuantityOfRegisters)
         {
             MMK_Message = new List<byte>();
             MMK_Message.Add(SlaveAddress);
-            MMK_Message.Add(FunctionCode);
+            MMK_Message.Add(MMK_function_code);
             MMK_Message.Add((byte)(StartingAddressOfRegister >> 8)); // сдвиг регистров на 8 позиций вправо, чтобы получить старший байт [HI Byte] 16 битного числа
             MMK_Message.Add((byte)(StartingAddressOfRegister & 0xFF)); // накладываем битовую маску 00000000 11111111 (0xFF) чтобы получить младший байт [LO Byte] 16 битного числа
             MMK_Message.Add((byte)(QuantityOfRegisters >> 8)); // сдвиг регистров на 8 позиций вправо, чтобы получить старший байт [HI Byte] 16 битного числа
@@ -89,11 +89,11 @@ namespace TR3100
             return MMK_message;
         }
 
-        private byte[] BuildModbusMessage(byte ModbusFunctionCode, ushort StartingAddressOfRegister, ushort ValueOfRegisterToWrite, byte SlaveAddress)
+        private byte[] Build_MMK_message(byte MMK_function_code, ushort StartingAddressOfRegister, ushort ValueOfRegisterToWrite, byte SlaveAddress)
         {
             MMK_Message = new List<byte>();
             MMK_Message.Add(SlaveAddress);
-            MMK_Message.Add(ModbusFunctionCode);
+            MMK_Message.Add(MMK_function_code);
             MMK_Message.Add((byte)(StartingAddressOfRegister >> 8)); // сдвиг регистров на 8 позиций вправо, чтобы получить старший байт [HI Byte] 16 битного числа
             MMK_Message.Add((byte)(StartingAddressOfRegister & 0xFF)); // накладываем битовую маску 00000000 11111111 (0xFF) чтобы получить младший байт [LO Byte] 16 битного числа
             MMK_Message.Add((byte)(ValueOfRegisterToWrite >> 8)); // сдвиг регистров на 8 позиций вправо, чтобы получить старший байт [HI Byte] 16 битного числа
@@ -142,7 +142,7 @@ namespace TR3100
         {
             this.ExpectedQuantityOfDataBytesInResponse = QuantityOfRegistersToRead * QuantityOfBytesInReg; // Ожидаемое количество байтов данных в сообщении ответа устройства
             this.ExpectedQuantityOfBytesInResponse = 5 + ExpectedQuantityOfDataBytesInResponse; // Ожидаемое количество байтов в сообщении ответа устройства
-            byte[] messageToSend = BuildModbusMessage(SlaveAddress, ModbusFunctionCode, StartingAddressOfRegisterToRead, QuantityOfRegistersToRead); // Формируем массив байт для отправки
+            byte[] messageToSend = Build_MMK_message(SlaveAddress, ModbusFunctionCode, StartingAddressOfRegisterToRead, QuantityOfRegistersToRead); // Формируем массив байт для отправки
             SendModbusMessage(messageToSend); // Отправляем данные
             ReadResponse(); // Читаем данные 
         }
@@ -150,7 +150,7 @@ namespace TR3100
 
         public void SendCommandToWriteRegisters(byte SlaveAddress, byte ModbusFunctionCode, ushort StartingAddressOfRegisterToWrite, ushort ValueOfRegisterToWrite)
         {
-            byte[] messageToSend = BuildModbusMessage(ModbusFunctionCode, StartingAddressOfRegisterToWrite, ValueOfRegisterToWrite, SlaveAddress);
+            byte[] messageToSend = Build_MMK_message(ModbusFunctionCode, StartingAddressOfRegisterToWrite, ValueOfRegisterToWrite, SlaveAddress);
             SendModbusMessage(messageToSend); // Отправляем данные
         }
 
