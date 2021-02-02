@@ -15,7 +15,7 @@ namespace TR3100
     class MMK
     {
         // Переменная которая хранит сообщние MMK протокола в виде List
-        private List<byte> MMK_Message;
+        //private List<byte> MMK_Message;
         // Переменная которая хранит сообщние MMK протокола в виде byte[]
         private byte[] MMK_message;
         // Экземпляр класса SerialPort
@@ -50,7 +50,7 @@ namespace TR3100
         private int ExpectedQuantityOfDataBytesInResponse;
         // Перемення хранит ожидаемое количество байт в ответе устройства
         private int ExpectedQuantityOfBytesInResponse;
-        
+
 
         /// <summary>
         /// Конструктор класса MMK
@@ -58,8 +58,6 @@ namespace TR3100
         /// <param name="communicationSettings">Экземпляр класса настроек сообщения с устройством Communication_settings</param>
         public MMK(Communication_settings communicationSettings)
         {
-            MMK_Message = new List<byte>();
-
             // КОНФИГУРИРОВАНИЕ COM-ПОРТА
             SerialPort = new SerialPort(communicationSettings.PortName, communicationSettings.BaudRate, communicationSettings.Parity, communicationSettings.DataBits, communicationSettings.StopBits);
             SerialPort.Handshake = communicationSettings.Handshake; // Аппаратное рукопожатие
@@ -69,22 +67,54 @@ namespace TR3100
             ResponseTimeout = communicationSettings.ResponseTimeout; // Интервал после которого начинается считывание поступивших данных на COM порт или вызывается исключение TimeoutException
         }
 
-        private byte[] Build_MMK_message(byte SlaveAddress, byte MMK_function_code, ushort StartingAddressOfRegister, ushort QuantityOfRegisters)
+        private byte[] Build_MMK_message(byte SlaveAddress, byte MMK_function_code, ushort StartingAddressOfRegister, byte QuantityOfRegisters)
         {
-            MMK_Message = new List<byte>();
-            MMK_Message.Add(SlaveAddress);
-            MMK_Message.Add(MMK_function_code);
-            MMK_Message.Add((byte)(StartingAddressOfRegister >> 8)); // сдвиг регистров на 8 позиций вправо, чтобы получить старший байт [HI Byte] 16 битного числа
-            MMK_Message.Add((byte)(StartingAddressOfRegister & 0xFF)); // накладываем битовую маску 00000000 11111111 (0xFF) чтобы получить младший байт [LO Byte] 16 битного числа
-            MMK_Message.Add((byte)(QuantityOfRegisters >> 8)); // сдвиг регистров на 8 позиций вправо, чтобы получить старший байт [HI Byte] 16 битного числа
-            MMK_Message.Add((byte)(QuantityOfRegisters & 0xFF)); // накладываем битовую маску 00001111 (0xF) чтобы получить младший байт [LO Byte] 16 битного числа
-            byte[] data = MMK_Message.ToArray(); // формируем массив данных по которым будет выполнен подсчет контрольной суммы
-            ushort CRC = GenerateCRC(data); // генерация контрольной суммы
-            byte CRC_LO_byte = (byte)(CRC & 0xFF); // разделение 2 байт на старший и младший байты
-            byte CRC_HI_byte = (byte)(CRC >> 8);
-            MMK_Message.Add(CRC_LO_byte); // добавление байтов контрольной суммы к сообщению MODBUS
-            MMK_Message.Add(CRC_HI_byte);
-            MMK_message = MMK_Message.ToArray(); // получаем массив байт (сообщение Modbus)
+            byte[] temp_array = new byte[5];
+
+            temp_array[0] = SlaveAddress;
+            temp_array[1] = MMK_function_code;
+            temp_array[2] = (byte)(StartingAddressOfRegister >> 8); // сдвиг регистров на 8 позиций вправо, чтобы получить старший байт [HI Byte] 16 битного числа
+            temp_array[3] = (byte)(StartingAddressOfRegister & 0xFF); // накладываем битовую маску 00000000 11111111 (0xFF) чтобы получить младший байт [LO Byte] 16 битного числа
+            temp_array[4] = QuantityOfRegisters;
+
+            ushort CRC_value = CRC.CRC16_BUYPASS(temp_array); // генерация контрольной суммы
+
+            byte CRC_HI_byte = (byte)(CRC_value >> 8);// разделение 2 байт на старший и младший байты
+            byte CRC_LO_byte = (byte)(CRC_value & 0xFF);
+
+            byte[] inform_part_of_message = new byte[7];
+
+            for (int i = 0; i < 5; i++)
+            {
+                inform_part_of_message[i] = temp_array[i];
+            }
+            inform_part_of_message[5] = CRC_HI_byte; // добавление байтов контрольной суммы к сообщению MMK
+            inform_part_of_message[6] = CRC_LO_byte;
+            temp_array = null;
+
+            List<byte> MMK_Message = new List<byte>();
+            MMK_Message.Add(0x10); // Начало информационного кадра 0x10 0x02 
+            MMK_Message.Add(0x02);
+
+            // Выяыление в информационной последовательности значения 0x10 и экранирование его еще одним значением 0x10
+            foreach (var item in inform_part_of_message)
+            {
+                if (item == 0x10)
+                {
+                    MMK_Message.Add(0x10);
+                    MMK_Message.Add(item);
+                }
+                else
+                {
+                    MMK_Message.Add(item);
+                }
+            }
+
+            MMK_Message.Add(0x10); // Конец информационного кадра 0x10 0x04 
+            MMK_Message.Add(0x04);
+
+            MMK_message = MMK_Message.ToArray(); // получаем массив байт (сообщение MMK)
+            MMK_Message = null;
 
             return MMK_message;
         }
