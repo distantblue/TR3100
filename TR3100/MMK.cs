@@ -119,6 +119,7 @@ namespace TR3100
             return MMK_message;
         }
 
+        /*
         private byte[] Build_MMK_message(byte MMK_function_code, ushort StartingAddressOfRegister, ushort ValueOfRegisterToWrite, byte SlaveAddress)
         {
             MMK_Message = new List<byte>();
@@ -138,53 +139,23 @@ namespace TR3100
 
             return MMK_message;
         }
+        */
 
-        /// <summary>
-        /// CRC-16/MODBUS algorithm
-        /// </summary>
-        /// <param name="data">Data bytes</param>
-        /// <returns>16-bit CRC16_MODBUS value</returns>
-        private ushort GenerateCRC(byte[] data)
+        public void SendCommandToReadRegisters(byte SlaveAddress, byte MMK_function_code, ushort StartingAddressOfRegisterToRead, byte QuantityOfBytesToRead)
         {
-            ushort poly = 0xA001;
-            ushort crc = 0xFFFF;
-            foreach (var item in data) // For each byte in buffer
-            {
-                crc ^= item; // Carry out XOR with CRC 
-
-                for (int i = 0; i < 8; i++) // For each bit in byte
-                {
-                    if ((crc & 0x0001) != 0) // If LSB of CRC == 1
-                    {
-                        crc >>= 1;
-                        crc ^= poly;
-                    }
-                    else
-                    {
-                        crc >>= 1;
-                    }
-                }
-            }
-            return crc;
-        }
-
-        public void SendCommandToReadRegisters(byte SlaveAddress, byte ModbusFunctionCode, ushort StartingAddressOfRegisterToRead, ushort QuantityOfRegistersToRead, int QuantityOfBytesInReg)
-        {
-            this.ExpectedQuantityOfDataBytesInResponse = QuantityOfRegistersToRead * QuantityOfBytesInReg; // Ожидаемое количество байтов данных в сообщении ответа устройства
-            this.ExpectedQuantityOfBytesInResponse = 5 + ExpectedQuantityOfDataBytesInResponse; // Ожидаемое количество байтов в сообщении ответа устройства
-            byte[] messageToSend = Build_MMK_message(SlaveAddress, ModbusFunctionCode, StartingAddressOfRegisterToRead, QuantityOfRegistersToRead); // Формируем массив байт для отправки
-            SendModbusMessage(messageToSend); // Отправляем данные
+            this.ExpectedQuantityOfDataBytesInResponse = QuantityOfBytesToRead; // Ожидаемое количество байтов данных в сообщении ответа устройства
+            byte[] messageToSend = Build_MMK_message(SlaveAddress, MMK_function_code, StartingAddressOfRegisterToRead, QuantityOfBytesToRead); // Формируем массив байт для отправки
+            Send_MMK_message(messageToSend); // Отправляем данные
             ReadResponse(); // Читаем данные 
         }
-
-
+        
         public void SendCommandToWriteRegisters(byte SlaveAddress, byte ModbusFunctionCode, ushort StartingAddressOfRegisterToWrite, ushort ValueOfRegisterToWrite)
         {
             byte[] messageToSend = Build_MMK_message(ModbusFunctionCode, StartingAddressOfRegisterToWrite, ValueOfRegisterToWrite, SlaveAddress);
-            SendModbusMessage(messageToSend); // Отправляем данные
+            Send_MMK_message(messageToSend); // Отправляем данные
         }
 
-        private void SendModbusMessage(byte[] modbusMessage)
+        private void Send_MMK_message(byte[] modbusMessage)
         {
             // ЕСЛИ ПОРТ ЗАКРЫТ
             if (!SerialPort.IsOpen)
@@ -337,7 +308,7 @@ namespace TR3100
             Thread.Sleep(50);
 
             // Повторно отправляем сообщение
-            SendModbusMessage(this.MMK_message);
+            Send_MMK_message(this.MMK_message);
         }
     }
 }
